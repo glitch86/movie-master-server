@@ -20,7 +20,6 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
     const db = client.db("movieMaster");
     const moviesCollection = db.collection("movies");
     const usersCollection = db.collection("users");
@@ -38,6 +37,15 @@ async function run() {
       const result = await moviesCollection.findOne(query);
       res.send(result);
     });
+
+    // adding new movie
+
+    app.post("/movies", async(req, res) => {
+      const data = req.body;
+      console.log(data);
+      const result = await moviesCollection.insertOne(data);
+      res.send(result);
+    })
 
     // adding new users
     app.post("/users", async (req, res) => {
