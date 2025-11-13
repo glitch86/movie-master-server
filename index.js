@@ -80,7 +80,7 @@ async function run() {
     });
 
     // update movie
-    app.put("/movies/update/:id",verifyToken, async (req, res) => {
+    app.put("/movies/update/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
       const data = req.body;
 
@@ -96,7 +96,7 @@ async function run() {
     });
 
     // delete a movie
-    app.delete("/movies/:id",  async (req, res) => {
+    app.delete("/movies/:id", async (req, res) => {
       const { id } = req.params;
       //    const objectId = new ObjectId(id)
       // const filter = {_id: objectId}
@@ -115,6 +115,12 @@ async function run() {
       res.send(result);
     });
 
+    // get all users
+    app.get("/users", async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result);
+    });
+
     // adding new users
     app.post("/users", async (req, res) => {
       const newUser = req.body;
@@ -128,25 +134,22 @@ async function run() {
         const result = await usersCollection.insertOne(newUser);
         res.send(result);
       }
-      
     });
 
-
     // watch list -
-    app.post("/watchlist/add", async(req, res) => {
+    app.post("/watchlist/add", async (req, res) => {
       const listData = req.body;
-      const id = req.body.movie_id
-      const query = {movie_id: id};
+      const id = req.body.movie_id;
+      const query = { movie_id: id };
       const existingItem = await watcListCollection.findOne(query);
 
       if (existingItem) {
-         res.send({ message: "already exists" });
+        res.send({ message: "already exists" });
       } else {
         const result = await watcListCollection.insertOne(listData);
-        res.send({message: "added to list"});
+        res.send({ message: "added to list" });
       }
-    })
-
+    });
 
     // getting data for watchlist
     app.get("/watchlist", async (req, res) => {
@@ -155,7 +158,6 @@ async function run() {
       const result = await watcListCollection.find({ email: email }).toArray();
       res.send(result);
     });
-
   } finally {
     // Ensures that the client will close when you finish/error
   }
