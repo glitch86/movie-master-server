@@ -11,9 +11,8 @@ const admin = require("firebase-admin");
 const serviceAccount = require("./serviceKey.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
-
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.n1li6q4.mongodb.net/?appName=Cluster0`;
@@ -27,11 +26,28 @@ const client = new MongoClient(uri, {
   },
 });
 
+// middleware
+const verifyToken = async (req, res, next) => {
+  const authorization = req.headers.authorization;
 
-const verifyToken = (req, res, next) => {
+  if (!authorization) {
+    return res.status(401).send({
+      message: "unauthorized access. Token not found!",
+    });
+  }
 
-}
+  const token = authorization.split(" ")[1];
+  try {
+    await admin.auth().verifyIdToken(token);
+    // console.log('succsess')
 
+    next();
+  } catch (error) {
+    res.status(401).send({
+      message: "unauthorized access.",
+    });
+  }
+};
 
 async function run() {
   try {
@@ -55,7 +71,7 @@ async function run() {
 
     // adding new movie
 
-    app.post("/movies/add", async (req, res) => {
+    app.post("/movies/add", verifyToken, async (req, res) => {
       const data = req.body;
       console.log(data);
       const result = await moviesCollection.insertOne(data);
@@ -63,7 +79,7 @@ async function run() {
     });
 
     // update movie
-    app.put("/movies/update/:id", async (req, res) => {
+    app.put("/movies/update/:id",verifyToken, async (req, res) => {
       const { id } = req.params;
       const data = req.body;
 
@@ -79,17 +95,19 @@ async function run() {
     });
 
     // delete a movie
-    app.delete("/movies/:id", async (req, res) => {
+    app.delete("/movies/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
       //    const objectId = new ObjectId(id)
       // const filter = {_id: objectId}
-      const result = await moviesCollection.deleteOne({ _id: new ObjectId(id) });
+      const result = await moviesCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
 
       res.send(result);
     });
 
     // getting data for my_collection page
-    app.get("/my-movies", async (req, res) => {
+    app.get("/my-collection", verifyToken, async (req, res) => {
       const email = req.query.email;
       // console.log(email);
       const result = await moviesCollection.find({ addedBy: email }).toArray();
