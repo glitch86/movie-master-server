@@ -55,9 +55,44 @@ async function run() {
     const moviesCollection = db.collection("movies");
     const usersCollection = db.collection("users");
     const watcListCollection = db.collection("watchlist");
+    const questionCollection = db.collection("questions");
+    const testimonialCollection = db.collection("testimonials");
+    const blogCollection = db.collection("blogs");
+
     // load all movies
     app.get("/movies", async (req, res) => {
-      const result = await moviesCollection.find().toArray();
+      // console.log("a",req.query)
+      const { searchText, genre, language } = req.query;
+
+      const query = {};
+      if (searchText) {
+        query.title = { $regex: searchText, $options: "i" };
+      }
+      if (genre) {
+        query.genre = genre;
+      }
+      if (language) {
+        query.language = language;
+      }
+      const result = await moviesCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // get faqs
+    app.get("/faqs", async (req, res) => {
+      const result = await questionCollection.find().toArray();
+      res.send(result);
+    });
+
+    // get testimonials
+    app.get("/testimonials", async (req, res) => {
+      const result = await testimonialCollection.find().toArray();
+      res.send(result);
+    });
+
+    // get blogs
+    app.get("/blogs", async (req, res) => {
+      const result = await blogCollection.find().toArray();
       res.send(result);
     });
 
