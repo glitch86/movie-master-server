@@ -2,6 +2,7 @@
 
 MovieMaster is your ultimate movie discovery and management platform — designed for cinephiles, creators, and casual viewers alike. Explore thousands of movies, manage your watchlist, and stay updated with the latest trends — all in one sleek, fast, and secure platform.
 
+live site url: https://movie-master-server-six.vercel.app/movies
 # Technologies:
 
 - React
@@ -48,4 +49,6 @@ Run the application:
 nodemon index.js
 ```
 
-live site url: https://movie-master-server-six.vercel.app/movies
+Author
+Site: https://polokahmed-portfolio.netlify.app
+LinkedIn: https://www.linkedin.com/in/polok-ahmed
